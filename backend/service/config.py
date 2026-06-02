@@ -23,6 +23,7 @@ ACCESS_TOKEN_EXPIRE_MINUTE = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTE", "30"))
 BACKEND_PUBLIC_URL = os.getenv("BACKEND_PUBLIC_URL", "http://localhost:8000")
 SQL_ECHO = os.getenv("SQL_ECHO", "false").lower() == "true"
 AUTO_VERIFY_EMAILS = os.getenv("AUTO_VERIFY_EMAILS", "false").lower() == "true"
+CORS_ALLOW_ALL = os.getenv("CORS_ALLOW_ALL", "false").lower() == "true"
 CORS_ORIGINS = [
     origin.strip()
     for origin in os.getenv(

@@ -18,18 +18,21 @@ interface LoginResponse {
 }
 
 export const loginRequest = async (data: LoginData): Promise<LoginResponse> => {
-  // 1. Asegúrate de que la URL sea 127.0.0.1 para evitar rollos de IPv6 en Arch
-  const response = await fetch(`${API_URL}/auth/login`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    // 2. El cuerpo DEBE ser un JSON que coincida con LoginSchema
-    body: JSON.stringify({
-      username: data.username, // Verifica si tu backend espera 'email' o 'username'
-      password: data.password,
-    }),
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${API_URL}/auth/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: data.username,
+        password: data.password,
+      }),
+    });
+  } catch {
+    throw new Error(`No se pudo conectar con la API: ${API_URL}`);
+  }
 
   const result = await response.json();
 

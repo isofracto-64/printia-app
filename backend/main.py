@@ -1,7 +1,7 @@
 
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
-from service.config import CORS_ORIGINS, db
+from service.config import CORS_ALLOW_ALL, CORS_ORIGINS, db
 from service.auth_service import (
     auto_verify_users_for_testing,
     generate_admin_user,
@@ -34,8 +34,8 @@ def init_app():
 
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=CORS_ORIGINS,
-        allow_credentials=True,
+        allow_origins=["*"] if CORS_ALLOW_ALL else CORS_ORIGINS,
+        allow_credentials=not CORS_ALLOW_ALL,
         allow_methods=["*"],
         allow_headers=["*"],
     )

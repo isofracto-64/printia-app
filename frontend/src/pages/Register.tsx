@@ -107,9 +107,9 @@ export default function Register() {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.detail || "Error en el registro");
-      navigate("/verify");
+      navigate("/login");
     } catch (err) {
-      fail(err instanceof Error ? err.message : "Error inesperado");
+      fail(err instanceof TypeError ? `No se pudo conectar con la API: ${API_URL}` : err instanceof Error ? err.message : "Error inesperado");
     } finally {
       setSubmitting(false);
     }
@@ -125,7 +125,7 @@ export default function Register() {
 
         <h1 className="h3 section-title">Crear cuenta</h1>
         <p className="text-muted-custom mb-4">
-          Verificaremos tu correo antes de permitir el acceso a la plataforma.
+          Crea tu usuario para entrar a la plataforma.
         </p>
 
         <form onSubmit={handleSubmit}>

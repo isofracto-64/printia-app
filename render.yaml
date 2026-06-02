@@ -22,6 +22,8 @@ services:
         sync: false
       - key: CORS_ORIGINS
         sync: false
+      - key: CORS_ALLOW_ALL
+        value: true
       - key: SQL_ECHO
         value: false
       - key: AUTO_VERIFY_EMAILS
@@ -59,7 +61,7 @@ services:
     staticPublishPath: dist
     envVars:
       - key: VITE_API_URL
-        sync: false
+        value: https://printia-api.onrender.com
       - key: VITE_SUPPORT_EMAIL
         sync: false
       - key: VITE_SUPPORT_COLLABORATORS
