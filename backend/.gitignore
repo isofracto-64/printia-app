@@ -1,0 +1,30 @@
+# SEGURIDAD 
+.env
+*.pem
+*.key
+
+# ENTORNOS VIRTUALES 
+venv/
+.venv/
+env/
+ENV/
+
+# TEMPORALES DE PYTHON
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# ARCHIVOS  PRUEBAS 
+uploads/
+media/
+temp/
+*.db
+*.sqlite3
+
+
+# HERRAMIENTAS Y EDITORES
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
