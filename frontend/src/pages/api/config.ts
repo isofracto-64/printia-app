@@ -2,7 +2,7 @@ const getApiUrl = () => {
   const configuredUrl = import.meta.env.VITE_API_URL?.trim();
   if (configuredUrl) return configuredUrl.replace(/\/$/, "");
 
-  if (typeof window !== "undefined" && window.location.hostname.endsWith("onrender.com")) {
+  if (import.meta.env.PROD || (typeof window !== "undefined" && window.location.hostname.endsWith("onrender.com"))) {
     return "https://printia-api.onrender.com";
   }
 

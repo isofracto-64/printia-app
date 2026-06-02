@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Toast from "../components/Toast";
 import { API_URL } from "../api/config";
+import { readApiResponse } from "../api/http";
 
 const universityMap: Record<string, string> = {
   "Universidad Tecnológica de Nuevo Laredo": "UT",
@@ -105,8 +106,7 @@ export default function Register() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.detail || "Error en el registro");
+      await readApiResponse(response);
       navigate("/login");
     } catch (err) {
       fail(err instanceof TypeError ? `No se pudo conectar con la API: ${API_URL}` : err instanceof Error ? err.message : "Error inesperado");

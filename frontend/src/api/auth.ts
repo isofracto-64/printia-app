@@ -1,4 +1,5 @@
 import { API_URL } from "./config";
+import { readApiResponse } from "./http";
 interface LoginData {
   username: string;
   password: string;
@@ -34,13 +35,5 @@ export const loginRequest = async (data: LoginData): Promise<LoginResponse> => {
     throw new Error(`No se pudo conectar con la API: ${API_URL}`);
   }
 
-  const result = await response.json();
-
-  if (!response.ok) {
-    // Si hay error 400, aquí verás el detalle en la consola
-    console.error("Error detalle:", result);
-    throw new Error(result.detail || "Error en los datos enviados");
-  }
-
-  return result;
+  return readApiResponse<LoginResponse>(response);
 };
