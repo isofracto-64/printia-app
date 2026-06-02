@@ -1,11 +1,12 @@
 import base64
 import os
 from datetime import datetime
+from datetime import date
 from uuid import uuid4
 from fastapi import HTTPException
 from uuid import uuid4
 
-from sqlalchemy import select, insert
+from sqlalchemy import select, insert, update
 from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 from passlib.context import CryptContext
@@ -20,6 +21,7 @@ from repository.auth_repo import JWTRepo
 from service.config import db
 from model import UserCredit
 from service.email_service import send_verification_email
+from service.config import AUTO_VERIFY_EMAILS
 
 from model import University
 
@@ -94,7 +96,8 @@ class AuthService:
                 username=register.username,
                 email=register.email,
                 password=pwd_context.hash(register.password),
-                person_id=person_id
+                person_id=person_id,
+                is_verified=AUTO_VERIFY_EMAILS,
             )
 
             session.add(user)
@@ -169,8 +172,9 @@ class AuthService:
                 session.add(student)
 
 
-            token = AuthService.create_email_verification_token(user.email)
-            await send_verification_email(user.email, token)
+            if not AUTO_VERIFY_EMAILS:
+                token = AuthService.create_email_verification_token(user.email)
+                await send_verification_email(user.email, token)
             await session.commit()
 
             return {"message": "User registered successfully"}
@@ -448,3 +452,80 @@ async def generate_kiosks():
         except Exception as e:
             await session.rollback()
             print(f"Error creando a printia: {e}")
+
+
+async def generate_admin_user():
+    username = os.getenv("ADMIN_DEFAULT_USERNAME", "").strip()
+    email = os.getenv("ADMIN_DEFAULT_EMAIL", "").strip().lower()
+    password = os.getenv("ADMIN_DEFAULT_PASSWORD", "")
+
+    if not username or not email or not password:
+        return
+
+    async with db.SessionLocal() as session:
+        existing = await session.scalar(
+            select(Users).where((Users.username == username) | (Users.email == email))
+        )
+
+        if existing:
+            return
+
+        role = await session.scalar(
+            select(Role).where(Role.role_name == "admin")
+        )
+
+        if not role:
+            print("Role admin not found")
+            return
+
+        person_id = str(uuid4())
+        user_id = str(uuid4())
+
+        person = Person(
+            id=person_id,
+            name=os.getenv("ADMIN_DEFAULT_NAME", "Administrador Printia"),
+            birth=date(2000, 1, 1),
+            sex="MALE",
+            profile="",
+            phone_number=os.getenv("ADMIN_DEFAULT_PHONE", "0000000000"),
+        )
+
+        user = Users(
+            id=user_id,
+            username=username,
+            email=email,
+            password=pwd_context.hash(password),
+            person_id=person_id,
+            is_verified=True,
+            created_at=datetime.now(),
+            modified_at=datetime.now(),
+        )
+
+        session.add(person)
+        await session.flush()
+        session.add(user)
+        await session.flush()
+        session.add(
+            UsersRole(
+                users_id=user_id,
+                role_id=role.id,
+                created_at=datetime.now(),
+                modified_at=datetime.now(),
+            )
+        )
+        session.add(UserCredit(user_id=user_id, balance=0))
+        await session.commit()
+        print("Admin user created")
+
+
+async def auto_verify_users_for_testing():
+    if not AUTO_VERIFY_EMAILS:
+        return
+
+    async with db.SessionLocal() as session:
+        await session.execute(
+            update(Users)
+            .where(Users.is_verified == False)
+            .values(is_verified=True)
+        )
+        await session.commit()

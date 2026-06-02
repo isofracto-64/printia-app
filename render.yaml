@@ -24,6 +24,14 @@ services:
         sync: false
       - key: SQL_ECHO
         value: false
+      - key: AUTO_VERIFY_EMAILS
+        value: true
+      - key: ADMIN_DEFAULT_USERNAME
+        sync: false
+      - key: ADMIN_DEFAULT_EMAIL
+        sync: false
+      - key: ADMIN_DEFAULT_PASSWORD
+        sync: false
       - key: MAIL_USERNAME
         sync: false
       - key: MAIL_PASSWORD

@@ -2,7 +2,13 @@
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
 from service.config import CORS_ORIGINS, db
-from service.auth_service import generate_role, generate_universities, generate_kiosks
+from service.auth_service import (
+    auto_verify_users_for_testing,
+    generate_admin_user,
+    generate_role,
+    generate_universities,
+    generate_kiosks,
+)
 from fastapi.staticfiles import StaticFiles
 import os
 
@@ -40,6 +46,8 @@ def init_app():
         await generate_role()
         await generate_universities()
         await generate_kiosks()
+        await generate_admin_user()
+        await auto_verify_users_for_testing()
 
     @app.on_event("shutdown")
     async def shutdown():
