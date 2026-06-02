@@ -43,6 +43,7 @@ def init_app():
     @app.on_event("startup")
     async def startup():
         await db.create_all()
+        await db.ensure_runtime_schema()
         await generate_role()
         await generate_universities()
         await generate_kiosks()

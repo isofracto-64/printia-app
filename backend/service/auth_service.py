@@ -21,7 +21,7 @@ from repository.auth_repo import JWTRepo
 from service.config import db
 from model import UserCredit
 from service.email_service import send_verification_email
-from service.config import AUTO_VERIFY_EMAILS
+from service.config import AUTO_VERIFY_EMAILS, EMAIL_VERIFICATION_ENABLED
 
 from model import University
 
@@ -91,13 +91,15 @@ class AuthService:
             await session.flush()
 
             # 🔹 Crear User
+            should_send_verification_email = EMAIL_VERIFICATION_ENABLED and not AUTO_VERIFY_EMAILS
+
             user = Users(
                 id=user_id,
                 username=register.username,
                 email=register.email,
                 password=pwd_context.hash(register.password),
                 person_id=person_id,
-                is_verified=AUTO_VERIFY_EMAILS,
+                is_verified=not should_send_verification_email,
             )
 
             session.add(user)
@@ -172,7 +174,7 @@ class AuthService:
                 session.add(student)
 
 
-            if not AUTO_VERIFY_EMAILS:
+            if should_send_verification_email:
                 token = AuthService.create_email_verification_token(user.email)
                 await send_verification_email(user.email, token)
             await session.commit()

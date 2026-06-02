@@ -22,13 +22,14 @@ ALGORITHM = os.getenv("ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTE = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTE", "30"))
 BACKEND_PUBLIC_URL = os.getenv("BACKEND_PUBLIC_URL", "http://localhost:8000")
 SQL_ECHO = os.getenv("SQL_ECHO", "false").lower() == "true"
-AUTO_VERIFY_EMAILS = os.getenv("AUTO_VERIFY_EMAILS", "false").lower() == "true"
+EMAIL_VERIFICATION_ENABLED = os.getenv("EMAIL_VERIFICATION_ENABLED", "false").lower() == "true"
+AUTO_VERIFY_EMAILS = os.getenv("AUTO_VERIFY_EMAILS", "true").lower() == "true"
 CORS_ALLOW_ALL = os.getenv("CORS_ALLOW_ALL", "false").lower() == "true"
 CORS_ORIGINS = [
     origin.strip()
     for origin in os.getenv(
         "CORS_ORIGINS",
-        "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000",
+        "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,https://printia-web.onrender.com",
     ).split(",")
     if origin.strip()
 ]
@@ -57,6 +58,17 @@ class AsyncDatabaseSession:
     async def create_all(self):
         async with self.engine.begin() as conn:
             await conn.run_sync(SQLModel.metadata.create_all)
+
+    async def ensure_runtime_schema(self):
+        from sqlalchemy import text
+
+        async with self.engine.begin() as conn:
+            await conn.execute(
+                text("ALTER TABLE users ADD COLUMN IF NOT EXISTS is_verified BOOLEAN NOT NULL DEFAULT TRUE")
+            )
+            await conn.execute(
+                text("UPDATE users SET is_verified = TRUE WHERE is_verified IS NULL")
+            )
 
     async def get_session(self):
         async with self.SessionLocal() as session:

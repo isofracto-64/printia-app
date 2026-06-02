@@ -34,10 +34,13 @@ Render llena automaticamente:
 - `DATABASE_URL`
 - `SECRET_KEY`
 
-Captura manualmente:
+`render.yaml` ya define:
 
 - `BACKEND_PUBLIC_URL`: URL final de la API, por ejemplo `https://printia-api.onrender.com`
 - `CORS_ORIGINS`: URL final del frontend, por ejemplo `https://printia-web.onrender.com`
+
+Captura manualmente solo si quieres activar correo real:
+
 - `MAIL_USERNAME`: correo SMTP
 - `MAIL_PASSWORD`: password/app password SMTP
 - `MAIL_FROM`: nombre y correo remitente, por ejemplo `Printia <soporte@tudominio.com>`
@@ -48,9 +51,12 @@ Los demas valores ya tienen defaults seguros en `render.yaml`.
 
 ## 4. Variables para `printia-web`
 
-Captura manualmente:
+`render.yaml` ya define:
 
 - `VITE_API_URL`: URL final de la API, por ejemplo `https://printia-api.onrender.com`
+
+Captura manualmente:
+
 - `VITE_SUPPORT_EMAIL`: correo publico de soporte
 - `VITE_SUPPORT_COLLABORATORS`: JSON con colaboradores, por ejemplo:
 

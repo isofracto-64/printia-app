@@ -19,11 +19,13 @@ services:
       - key: ACCESS_TOKEN_EXPIRE_MINUTE
         value: 30
       - key: BACKEND_PUBLIC_URL
-        sync: false
+        value: https://printia-api.onrender.com
       - key: CORS_ORIGINS
-        sync: false
+        value: https://printia-web.onrender.com
       - key: CORS_ALLOW_ALL
         value: true
+      - key: EMAIL_VERIFICATION_ENABLED
+        value: false
       - key: SQL_ECHO
         value: false
       - key: AUTO_VERIFY_EMAILS
