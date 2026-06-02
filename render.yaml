@@ -36,6 +36,18 @@ services:
         sync: false
       - key: ADMIN_DEFAULT_PASSWORD
         sync: false
+      - key: DEFAULT_KIOSK_USERNAME
+        sync: false
+      - key: DEFAULT_KIOSK_EMAIL
+        sync: false
+      - key: DEFAULT_KIOSK_PASSWORD
+        sync: false
+      - key: DEFAULT_USER_USERNAME
+        sync: false
+      - key: DEFAULT_USER_EMAIL
+        sync: false
+      - key: DEFAULT_USER_PASSWORD
+        sync: false
       - key: MAIL_USERNAME
         sync: false
       - key: MAIL_PASSWORD

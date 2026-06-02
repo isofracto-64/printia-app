@@ -46,6 +46,8 @@ Captura manualmente solo si quieres activar correo real:
 - `MAIL_FROM`: nombre y correo remitente, por ejemplo `Printia <soporte@tudominio.com>`
 - `KIOSK_DEFAULT_EMAIL`: correo del usuario kiosco
 - `KIOSK_DEFAULT_PASSWORD`: password fuerte del usuario kiosco
+- `DEFAULT_KIOSK_USERNAME`, `DEFAULT_KIOSK_EMAIL`, `DEFAULT_KIOSK_PASSWORD`: usuario inicial con rol `kiosk`
+- `DEFAULT_USER_USERNAME`, `DEFAULT_USER_EMAIL`, `DEFAULT_USER_PASSWORD`: usuario inicial con rol `user`
 
 Los demas valores ya tienen defaults seguros en `render.yaml`.
 

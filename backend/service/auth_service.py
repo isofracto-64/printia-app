@@ -456,10 +456,17 @@ async def generate_kiosks():
             print(f"Error creando a printia: {e}")
 
 
-async def generate_admin_user():
-    username = os.getenv("ADMIN_DEFAULT_USERNAME", "").strip()
-    email = os.getenv("ADMIN_DEFAULT_EMAIL", "").strip().lower()
-    password = os.getenv("ADMIN_DEFAULT_PASSWORD", "")
+async def generate_default_account(
+    *,
+    username: str,
+    email: str,
+    password: str,
+    role_name: str,
+    name: str,
+    phone_number: str = "0000000000",
+):
+    username = username.strip()
+    email = email.strip().lower()
 
     if not username or not email or not password:
         return
@@ -473,40 +480,42 @@ async def generate_admin_user():
             return
 
         role = await session.scalar(
-            select(Role).where(Role.role_name == "admin")
+            select(Role).where(Role.role_name == role_name)
         )
 
         if not role:
-            print("Role admin not found")
+            print(f"Role {role_name} not found")
             return
 
         person_id = str(uuid4())
         user_id = str(uuid4())
 
-        person = Person(
-            id=person_id,
-            name=os.getenv("ADMIN_DEFAULT_NAME", "Administrador Printia"),
-            birth=date(2000, 1, 1),
-            sex="MALE",
-            profile="",
-            phone_number=os.getenv("ADMIN_DEFAULT_PHONE", "0000000000"),
+        session.add(
+            Person(
+                id=person_id,
+                name=name,
+                birth=date(2000, 1, 1),
+                sex="MALE",
+                profile="",
+                phone_number=phone_number,
+            )
         )
+        await session.flush()
 
-        user = Users(
-            id=user_id,
-            username=username,
-            email=email,
-            password=pwd_context.hash(password),
-            person_id=person_id,
-            is_verified=True,
-            created_at=datetime.now(),
-            modified_at=datetime.now(),
+        session.add(
+            Users(
+                id=user_id,
+                username=username,
+                email=email,
+                password=pwd_context.hash(password),
+                person_id=person_id,
+                is_verified=True,
+                created_at=datetime.now(),
+                modified_at=datetime.now(),
+            )
         )
+        await session.flush()
 
-        session.add(person)
-        await session.flush()
-        session.add(user)
-        await session.flush()
         session.add(
             UsersRole(
                 users_id=user_id,
@@ -517,7 +526,40 @@ async def generate_admin_user():
         )
         session.add(UserCredit(user_id=user_id, balance=0))
         await session.commit()
-        print("Admin user created")
+        print(f"Default {role_name} user created")
+
+
+async def generate_admin_user():
+    await generate_default_account(
+        username=os.getenv("ADMIN_DEFAULT_USERNAME", ""),
+        email=os.getenv("ADMIN_DEFAULT_EMAIL", ""),
+        password=os.getenv("ADMIN_DEFAULT_PASSWORD", ""),
+        role_name="admin",
+        name=os.getenv("ADMIN_DEFAULT_NAME", "Administrador Printia"),
+        phone_number=os.getenv("ADMIN_DEFAULT_PHONE", "0000000000"),
+    )
+
+
+async def generate_default_kiosk_user():
+    await generate_default_account(
+        username=os.getenv("DEFAULT_KIOSK_USERNAME", ""),
+        email=os.getenv("DEFAULT_KIOSK_EMAIL", ""),
+        password=os.getenv("DEFAULT_KIOSK_PASSWORD", ""),
+        role_name="kiosk",
+        name=os.getenv("DEFAULT_KIOSK_NAME", "Kiosko Printia"),
+        phone_number=os.getenv("DEFAULT_KIOSK_PHONE", "0000000000"),
+    )
+
+
+async def generate_default_regular_user():
+    await generate_default_account(
+        username=os.getenv("DEFAULT_USER_USERNAME", ""),
+        email=os.getenv("DEFAULT_USER_EMAIL", ""),
+        password=os.getenv("DEFAULT_USER_PASSWORD", ""),
+        role_name="user",
+        name=os.getenv("DEFAULT_USER_NAME", "Usuario Printia"),
+        phone_number=os.getenv("DEFAULT_USER_PHONE", "0000000000"),
+    )
 
 
 async def auto_verify_users_for_testing():
